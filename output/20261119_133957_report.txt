@@ -1,0 +1,96 @@
+======================================================================
+Generalized Fast Color Clustering — California Housing
+Run: 20261119_133957
+======================================================================
+
+======================================================================
+SECTION 0 — Bit-exactness Verification (C=3 vs Reference)
+======================================================================
+  Test image: 512×512×3 uint8
+  Reference bits:    1
+  Generalized bits:  1
+  Reference n_initial_colors: 8
+  Generalized n_initial:      8
+  ARI (ref vs generalized):   1.000000   (1.0 = bit-exact)
+  ✓ BIT-EXACT: generalized reproduces the reference for C=3.
+  Saved: bitexact_verification.png
+
+======================================================================
+SECTION 1 — California Housing Dataset + uint8 Scaling
+======================================================================
+  Shape: (20640, 8)   Features: ['MedInc', 'HouseAge', 'AveRooms', 'AveBedrms', 'Population', 'AveOccup', 'Latitude', 'Longitude']
+  Target range: [0.150, 5.000]
+  minmax     -> uint8 shape (20640, 8), mean=53.4, std=64.1
+  robust     -> uint8 shape (20640, 8), mean=53.4, std=64.1
+  quantile   -> uint8 shape (20640, 8), mean=127.8, std=73.7
+
+======================================================================
+SECTION 2 — 129×160×8 Tensor Representation
+======================================================================
+  minmax: tensor shape (129, 160, 8)
+    Saved: 20261119_133957_tensor_minmax.png
+  robust: tensor shape (129, 160, 8)
+    Saved: 20261119_133957_tensor_robust.png
+  quantile: tensor shape (129, 160, 8)
+    Saved: 20261119_133957_tensor_quantile.png
+
+======================================================================
+SUPPLEMENTARY — Scaling Method Comparison (FastCC, K=5)
+======================================================================
+  minmax    : silhouette=0.1310  η²=0.3551  n_initial=31  bits=1
+  robust    : silhouette=0.1310  η²=0.3551  n_initial=31  bits=1
+  quantile  : silhouette=0.0419  η²=0.1425  n_initial=192  bits=1
+    Saved: scaling_comparison.png
+
+======================================================================
+SECTION 3 — Benchmark: KMeans(Standard) / KMeans(uint8) / FastCC
+======================================================================
+  (a) StandardScaler + KMeans
+    time=0.154s  silhouette=0.2949  η²=0.0528
+    cluster sizes: [8214, 3920, 8429, 3, 74]
+  (b) KMeans directly on uint8 data
+    time=0.112s  silhouette=0.3230  η²=0.0137
+    cluster sizes: [3864, 3892, 2616, 4812, 5456]
+  (c) Generalized Fast Color Clustering
+    time=0.007s  silhouette=0.1310  η²=0.3551
+    bits/channel=1  n_initial_keys=31
+    cluster sizes: [7008, 5058, 3493, 2892, 2189]
+
+  ARI cross-comparison:
+    ARI(Standard vs uint8) = 0.4227
+    ARI(Standard vs FastCC) = 0.3561
+    ARI(uint8 vs FastCC)    = 0.2104
+
+    Saved: cluster_maps.png
+    Saved: feature_heatmaps.png
+    Saved: metrics_summary.png
+======================================================================
+SECTION 4 — Robustness Validation
+======================================================================
+  (a) 20-fold bootstrap stability (ARI between original and bootstrap)
+    fold  5/20  ARI=0.8834
+    fold 10/20  ARI=0.8833
+    fold 15/20  ARI=0.8686
+    fold 20/20  ARI=0.9805
+
+  Bootstrap ARI — mean=0.8621 ± 0.0895
+  Bootstrap ARI — min=0.7177  max=0.9814
+
+  (b) Null hypothesis test — shuffled-column data
+  Original silhouette:        0.1310
+  Null silhouette mean ± std: 0.0951 ± 0.0230
+  Silhouette degradation:     0.0359  (signal confirmed)
+  One-sided t-test (null < real): t=-6.802  p=0.0000
+    Saved: robustness.png
+
+======================================================================
+FINAL SUMMARY TABLE
+======================================================================
+Method                  Time(s)  Silhouette       η²  ARI_vs_Std
+----------------------------------------------------------------
+KMeans+Standard           0.154      0.2949   0.0528      1.0000
+KMeans+uint8              0.112      0.3230   0.0137      0.4227
+FastCC                    0.007      0.1310   0.3551      0.3561
+
+Bootstrap stability (FastCC): ARI = 0.8621 ± 0.0895
+Null silhouette degradation:  0.0359

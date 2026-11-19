@@ -145,16 +145,13 @@ package-lock.json
 
 # =============================================================================
 # INPUT / OUTPUT FOLDERS
-# Content is regenerated on each run; only the folder anchor is tracked.
+# output/ is fully tracked - all generated plots and reports are committed.
 # =============================================================================
 
 # Input documents (keep folder via .gitkeep; content is local/private)
 input/*
 !input/.gitkeep
 
-# Generated outputs (keep folder via .gitkeep; re-run analysis.py to reproduce)
-output/*
-!output/.gitkeep
 
 
 # =============================================================================
